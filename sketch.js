@@ -1,67 +1,55 @@
-var helicopterIMG, helicopterSprite, packageSprite,packageIMG;
-var packageBody,ground,wall1,wall2,wall3;
-const Engine = Matter.Engine;
-const World = Matter.World;
-const Bodies = Matter.Bodies;
-const Body = Matter.Body;
-
-function preload()
-{
-	helicopterIMG=loadImage("helicopter.png")
-	packageIMG=loadImage("package.png")
-}
+var wall, bullet, speed, weight, thickness
+var bulletXstart, bulletXend, bulletYstart, bulletYend;
+var wallXstart, wallXend, wallYstart, wallYend;
 
 function setup() {
-	createCanvas(800, 700);
-	rectMode(CENTER);
-	wall1=new Wall(500, 650, 30, 200);
-	wall2=new Wall(50,50,50,50);
-	wall3=new Wall(50,50,50,50);
- 
-	packageSprite=createSprite(width/2, 80, 10,10);
-	packageSprite.addImage(packageIMG)
-	packageSprite.scale=0.2
-
-	helicopterSprite=createSprite(width/2, 200, 10,10);
-	helicopterSprite.addImage(helicopterIMG)
-	helicopterSprite.scale=0.6
-
-	groundSprite=createSprite(width/2, height-35, width,10);
-	groundSprite.shapeColor=color(255)
-
-
-	engine = Engine.create();
-	world = engine.world;
-
-	packageBody = Bodies.circle(width/2 , 200 , 5 , {restitution:0.4, isStatic:true});
-	World.add(world, packageBody);
-	
-
-	//Create a Ground
-	ground = Bodies.rectangle(width/2, 650, width, 10 , {isStatic:true} );
- 	World.add(world, ground);
-
-
-	Engine.run(engine);
-  
+  createCanvas(2000,500);
+  thickness = random(22, 83);
+  bullet = createSprite(50, 200, 50, 50);
+   wall = createSprite(1500, 200, thickness, height/2);
+   speed = random(100, 200)
+   weight = random(30, 52)
+   bullet.shapeColor = "white";
+   wall.shapeColor=color(80,80,80);
 }
-
 
 function draw() {
-  rectMode(CENTER);
-  background(0);
-  packageSprite.x= packageBody.position.x 
-  packageSprite.y= packageBody.position.y 
-  drawSprites();
- 
-}
+  background("black")
 
-function keyPressed() {
- if (keyCode === DOWN_ARROW) {
-    // Look at the hints in the document and understand how to make the package body fall only on
-    Matter.Body.setStatic( packageBody, false);
+
+  bullet.velocityX=speed;
+  if(istouching(wall, bullet)){
+    bullet.velocityX = 0;
+      var deformation = (0.5 * weight * speed * speed)/(thickness* thickness* thickness)
+     if (deformation>3){
+      wall.shapeColor=color(255,0,0);
+      }
+      if (deformation<3){
+        wall.shapeColor=color(0,255,0);
+     }
   }
+  if (bullet.x>2000){
+    wall.shapeColor=color(255,0,0);
+  }
+  drawSprites();
 }
 
+function istouching(imput1, imput2){
+  wallXstart = imput1.x - imput1.width/2;
+  wallXend = imput1.x + imput1.width/2;
+  wallYstart = imput1.y - imput1.height/2;
+  wallYend = imput1.y + imput1.height/2;
 
-
+  bulletXstart = imput2.x - imput2.width/2;
+  bulletXend = imput2.x + imput2.width/2;
+  bulletYstart = imput2.y - imput2.height/2;
+  bulletYend = imput2.y + imput2.height/2;
+  
+  
+  if(wallXend>bulletXstart && wallXstart<bulletXend && wallYend>bulletYstart && wallYstart<bulletYend){
+    return true;
+  }
+    else{
+      return false;
+    }
+}
